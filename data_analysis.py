@@ -1,7 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data = pd.read_csv('data/raw_data.csv', index_col=0)
+from data_loader import load_data
+
+data = load_data()
 
 print(data.head())
 
