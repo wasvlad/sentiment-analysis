@@ -17,7 +17,7 @@ def load_data() -> pd.DataFrame:
     shutil.copy2(src_file, dst_file)
     print("Path to dataset files:", path)
     print("Raw data copied to:", dst_file)
-    return pd.read_csv(dst_file, index_col=0)
+    return pd.read_csv(dst_file, index_col=0).head(1000)
 
 if __name__ == "__main__":
     print(load_data().head())
