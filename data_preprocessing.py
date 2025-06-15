@@ -15,13 +15,13 @@ def s_bert(data):
     embeddings = model.encode(data, convert_to_tensor=True)
     return embeddings
 
-def bag_of_words(data, max_features=10):
+def bag_of_words(data, max_features=300):
     """
     Function to generate bag-of-words embeddings from text data using only the most frequent words.
 
     Args:
         data (list or array-like): List of sentences/documents to vectorize.
-        max_features (int): Number of most frequent words to use. Default is 1000.
+        max_features (int): Number of most frequent words to use. Default is 100.
 
     Returns:
         numpy.ndarray: Bag-of-words embeddings.

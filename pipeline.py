@@ -6,19 +6,24 @@ class PipeLine:
         self.model = None
         self.history = None
 
-    def train(self, epochs=100):
-        data = self.loader()
-        preprocessed = self.preprocessor(data['text'])
+    def preprocess(self, data):
+        preprocessed = self.preprocessor(data)
         import numpy as np
         if hasattr(preprocessed, 'detach') and hasattr(preprocessed, 'cpu'):
-            x = preprocessed.detach().cpu().numpy()
+            data = preprocessed.detach().cpu().numpy()
         else:
-            x = np.array(preprocessed)
-        y = data['label'].values
-        self.model = self.model_builder(embedding_dim=x.shape[1])
+            data = np.array(preprocessed)
+        return data
+
+    def train(self, x_train, y_train, x_val, y_val, epochs=100):
+        x_train = self.preprocess(x_train)
+        x_val = self.preprocess(x_val)
+        self.model = self.model_builder(embedding_dim=x_train.shape[1])
         from tensorflow import keras
-        early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True, mode='min')
-        history = self.model.fit(x, y, epochs=epochs, validation_split=0.2, callbacks=[early_stopping])
+        early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True, mode='min')
+        history = self.model.fit(x_train, y_train, validation_data = (x_val, y_val),
+                                 epochs=epochs,
+                                 callbacks=[early_stopping])
         self.history = history
         return history
 
@@ -34,8 +39,15 @@ class PipeLine:
             x = preprocessed.detach().cpu().numpy()
         else:
             x = np.array(preprocessed)
-        model = self.model_builder(embedding_dim=x.shape[1])
-        return model.predict(x)
+        return self.model.predict(x)
+
+    def evaluate(self, x, y):
+        prediction = self.predict(x)
+        import numpy as np
+        y_predicted = np.argmax(prediction, axis=1)
+        from sklearn.metrics import f1_score
+        fscore = f1_score(y, y_predicted, average='macro')
+        return fscore
 
     @staticmethod
     def load(path) -> 'PipeLine':

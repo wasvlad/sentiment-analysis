@@ -1,6 +1,6 @@
 from pipeline import PipeLine
 
-pl = PipeLine.load("data/model.pkl")
+pl = PipeLine.load("data/model-first.pkl")
 text = input("Enter text: ")
 while text:
     prediction = pl.predict([text])

@@ -10,10 +10,15 @@ def get_classification_model(embedding_dim: int, num_classes: int = 6) -> tf.ker
         tf.keras.Model: Compiled classification model.
     """
     inputs = tf.keras.Input(shape=(embedding_dim,))
-    x = tf.keras.layers.Dense(8, activation='relu')(inputs)
-    x = tf.keras.layers.Dropout(0.3)(x)
-    x = tf.keras.layers.Dense(4, activation='relu')(x)
-    outputs = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
+    x = tf.keras.layers.Dense(1024, activation='relu')(inputs)
+    x = tf.keras.layers.Dense(512, activation='relu')(x)
+    x = tf.keras.layers.Dense(256, activation='relu')(x)
+    x = tf.keras.layers.Dense(128, activation='relu')(x)
+    #x = tf.keras.layers.Dropout(0.3)(x)
+    x = tf.keras.layers.Dense(64, activation='relu')(x)
+    outputs = tf.keras.layers.Dense(num_classes)(x)
     model = tf.keras.Model(inputs=inputs, outputs=outputs)
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer='adam',
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                  metrics=['accuracy'])
     return model
