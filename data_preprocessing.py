@@ -1,3 +1,4 @@
+import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -12,6 +13,20 @@ def s_bert(data):
         list: List of sentence embeddings.
     """
     model = SentenceTransformer('paraphrase-MiniLM-L3-v2')  # Small, fast
+    embeddings = model.encode(data, convert_to_tensor=True)
+    return embeddings
+
+def s_bert_better(data):
+    """
+    Function to generate sentence embeddings using a more powerful Sentence-BERT model.
+
+    Args:
+        data (list): List of sentences to encode.
+
+    Returns:
+        list: List of sentence embeddings.
+    """
+    model = SentenceTransformer('all-MiniLM-L6-v2')  # More powerful, slower
     embeddings = model.encode(data, convert_to_tensor=True)
     return embeddings
 
@@ -30,6 +45,29 @@ def bag_of_words(data, max_features=300):
     X = vectorizer.fit_transform(data)
     return X.toarray()
 
+
+def data_balancer(x, y):
+    label_counts = {}
+    max_count = 0
+    for label in y:
+        if label not in label_counts:
+            label_counts[label] = 0
+        label_counts[label] += 1
+        max_count = max(max_count, label_counts[label])
+    balanced_x, balanced_y = [], []
+    def is_balanced():
+        for count in label_counts.values():
+            if count < max_count:
+                return False
+        return True
+    label_counts = {label: 0 for label in label_counts}  # Reset counts for balancing
+    while not is_balanced():
+        for x_ex, y_ex in zip(x, y):
+            if label_counts[y_ex] < max_count:
+                balanced_x.append(x_ex)
+                balanced_y.append(y_ex)
+                label_counts[y_ex] += 1
+    return balanced_x, np.array(balanced_y)
 
 
 if __name__ == "__main__":

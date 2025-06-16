@@ -1,11 +1,10 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 from data_loader import load_data
+from data_preprocessing import data_balancer
 
-data = load_data()
-
-print(data.head())
+x_train, y_train, x_val, y_val, x_test, y_test = load_data()
 
 label_mapping = {
     0: 'sadness',
@@ -16,15 +15,16 @@ label_mapping = {
     5: 'surprise',
 }
 
+x_train, y_train = data_balancer(x_train, y_train)
 # Count label occurrences
-label_counts = data['label'].value_counts().sort_index()
+label_counts = np.bincount(y_train)
 
 # Map label numbers to text
-label_names = [label_mapping[label] for label in label_counts.index]
+label_names = [label_mapping[label] for label in range(len(label_counts))]
 
 # Plot
 plt.figure(figsize=(8, 5))
-plt.bar(label_names, label_counts.values, color='skyblue')
+plt.bar(label_names, label_counts, color='skyblue')
 plt.xlabel('Emotion')
 plt.ylabel('Count')
 plt.title('Distribution of Emotions in Dataset')

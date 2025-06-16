@@ -3,13 +3,13 @@ from matplotlib import pyplot as plt
 from pipeline import PipeLine
 
 from data_loader import load_data
-from data_preprocessing import s_bert, bag_of_words
-from models import get_classification_model
+from data_preprocessing import s_bert, bag_of_words, data_balancer, s_bert_better
+from models import get_classification_model, get_model_regulized
 
 
 x_train, y_train, x_val, y_val, x_test, y_test = load_data()
 pl = PipeLine(loader=load_data,
-              preprocessor=s_bert,
+              preprocessor=s_bert_better,
               model_builder=get_classification_model)
 
 
