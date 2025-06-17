@@ -1,6 +1,8 @@
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import CountVectorizer
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 def s_bert(data):
     """
@@ -27,6 +29,11 @@ def s_bert_better(data):
         list: List of sentence embeddings.
     """
     model = SentenceTransformer('all-MiniLM-L6-v2')  # More powerful, slower
+    embeddings = model.encode(data, convert_to_tensor=True)
+    return embeddings
+
+def s_bert_best(data):
+    model = SentenceTransformer('all-mpnet-base-v2')
     embeddings = model.encode(data, convert_to_tensor=True)
     return embeddings
 
@@ -68,6 +75,35 @@ def data_balancer(x, y):
                 balanced_y.append(y_ex)
                 label_counts[y_ex] += 1
     return balanced_x, np.array(balanced_y)
+
+
+def get_tokenizer(text):
+    """
+    Tokenizes the input text into words.
+
+    Args:
+        text (str): Input text to tokenize.
+
+    Returns:
+        list: List of tokens (words).
+    """
+    tokenizer = Tokenizer(num_words=5000, oov_token="<OOV>")
+    tokenizer.fit_on_texts(text)
+    def preprocess(x):
+        """
+        Preprocesses the input text by tokenizing and padding.
+
+        Args:
+            x (str): Input text to preprocess.
+
+        Returns:
+            numpy.ndarray: Padded sequence of tokens.
+        """
+        sequences = tokenizer.texts_to_sequences(x)
+        padded = pad_sequences(sequences, maxlen=100, padding='post')
+        return padded
+
+    return preprocess
 
 
 if __name__ == "__main__":

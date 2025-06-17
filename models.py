@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-def get_classification_model(embedding_dim: int, num_classes: int = 6) -> tf.keras.Model:
+def get_classification_model(x, num_classes: int = 6) -> tf.keras.Model:
     """
     Returns a TensorFlow classification model that takes embeddings as input.
     Args:
@@ -9,7 +9,7 @@ def get_classification_model(embedding_dim: int, num_classes: int = 6) -> tf.ker
     Returns:
         tf.keras.Model: Compiled classification model.
     """
-    inputs = tf.keras.Input(shape=(embedding_dim,))
+    inputs = tf.keras.Input(shape=(x.shape[1],))
     x = tf.keras.layers.Dense(512, activation='relu')(inputs)
     x = tf.keras.layers.Dense(256, activation='relu')(x)
     x = tf.keras.layers.Dense(128, activation='relu')(x)
@@ -21,8 +21,8 @@ def get_classification_model(embedding_dim: int, num_classes: int = 6) -> tf.ker
                   metrics=['accuracy'])
     return model
 
-def get_model_regulized(embedding_dim: int, num_classes: int = 6) -> tf.keras.Model:
-    inputs = tf.keras.Input(shape=(embedding_dim,))
+def get_model_regulized(x, num_classes: int = 6) -> tf.keras.Model:
+    inputs = tf.keras.Input(shape=(x.shape[1],))
     x = tf.keras.layers.Dense(512, activation='relu')(inputs)
     x = tf.keras.layers.BatchNormalization()(x)
     x = tf.keras.layers.Dropout(0.3)(x)
@@ -39,20 +39,21 @@ def get_model_regulized(embedding_dim: int, num_classes: int = 6) -> tf.keras.Mo
                   metrics=['accuracy'])
     return model
 
-def get_model_with_embeddings() -> tf.keras.Model:
+def get_model_with_embeddings(x, num_classes: int = 6) -> tf.keras.Model:
     """
     Returns a TensorFlow model that trains embeddings.
     This is a placeholder function; actual implementation would depend on the specific embedding layer used.
     """
     # Example implementation, replace with actual embedding layer
-    embedding_layer = tf.keras.layers.Embedding(input_dim=10000, output_dim=300, input_length=100)
-
-    inputs = tf.keras.Input(shape=(100,))
-    x = embedding_layer(inputs)
-    x = tf.keras.layers.GlobalAveragePooling1D()(x)
-    x = tf.keras.layers.Dense(128, activation='relu')(x)
-    outputs = tf.keras.layers.Dense(6)(x)  # Assuming 6 classes for classification
-    model = tf.keras.Model(inputs=inputs, outputs=outputs)
+    model = tf.keras.Sequential([
+        tf.keras.layers.Embedding(input_dim=x.shape[1], output_dim=1024),
+        tf.keras.layers.GlobalAveragePooling1D(),
+        tf.keras.layers.Dense(1024, activation='relu'),
+        tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(num_classes)
+    ])
 
     model.compile(optimizer='adam',
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),

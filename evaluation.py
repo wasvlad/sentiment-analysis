@@ -11,7 +11,7 @@ pl = PipeLine.load("data/model.pkl")
 
 # print(f"Train f1-score: {pl.evaluate(x_train, y_train)}")
 # print(f"Val f1-score: {pl.evaluate(x_val, y_val)}")
-# print(f"Test f1-score: {pl.evaluate(x_test, y_test)}")
+print(f"Test f1-score: {pl.evaluate(x_test, y_test)}")
 
 y_predicted = pl.predict(x_val)
 y_predicted = np.argmax(y_predicted, axis=1)

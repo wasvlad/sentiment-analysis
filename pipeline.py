@@ -22,9 +22,9 @@ class PipeLine:
               class_weight=None):
         x_train, y_train = self.preprocess(x_train, y_train, training=True)
         x_val, y_val = self.preprocess(x_val, y_val, training=False)
-        self.model = self.model_builder(embedding_dim=x_train.shape[1])
+        self.model = self.model_builder(x_train)
         from tensorflow import keras
-        early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5,
+        early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=20,
                                                        restore_best_weights=True, mode='min')
         history = self.model.fit(x_train, y_train, validation_data=(x_val, y_val),
                                  class_weight=class_weight,
