@@ -15,7 +15,6 @@ label_mapping = {
     5: 'surprise',
 }
 
-x_train, y_train = data_balancer(x_train, y_train)
 # Count label occurrences
 label_counts = np.bincount(y_train)
 
